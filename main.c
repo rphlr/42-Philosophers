@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/17 11:42:08 by rrouille          #+#    #+#             */
-/*   Updated: 2023/05/19 12:02:00 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/05/25 15:45:35 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	init(int ac, char **av)
 	t_philo_state.left_fork_free = true;
 }
 
-bool check_int(char *cur_arg_value)
+bool	check_int(char *cur_arg_value)
 {
 	while (*cur_arg_value)
 	{

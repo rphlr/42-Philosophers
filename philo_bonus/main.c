@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/17 11:42:08 by rrouille          #+#    #+#             */
-/*   Updated: 2023/05/19 12:02:03 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/05/25 15:22:06 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,7 @@ struct s_philo_state
 	bool	is_eating;
 }	t_philo_state;
 
-
-bool check_int(char *cur_arg_value)
+bool	check_int(char *cur_arg_value)
 {
 	while (*cur_arg_value)
 	{
@@ -66,8 +65,5 @@ int	main(int ac, char **av)
 	else
 	{
 		printf("OK\n");
-		
 	}
-	// init_philos();
-	// init_forks();
 }

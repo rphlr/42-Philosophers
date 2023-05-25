@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/05/19 12:01:58 by rrouille         ###   ########.fr        #
+#    Updated: 2023/05/25 15:44:40 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,6 +53,9 @@ INVERTED		= \033[7m
 
 # Clear screen
 CLEAR			= \033c
+
+# Clear line
+CLEARLN			= \r\033[K
 
 # Sources
 SRCS			= ${shell find ${SRCSDIR} -maxdepth 1 -type f -name '*.c'}
@@ -101,12 +104,12 @@ ${NAME}: ${OBJS}
 			@sleep 0.5
 
 # Run the program
-run:	clear ${NAME}
+run:	clear ${NAME} draw_run
 #	@${call shuffle_animation}
-			@echo "${CLEAR}${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
+			@echo "${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
 			@./${NAME} ${ARGS}
-r:		clear ${NAME}
-			@echo "${CLEAR}${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
+r:		clear ${NAME} draw_run
+			@echo "${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
 			@./${NAME} ${ARGS}
 
 # Tests
@@ -147,11 +150,11 @@ b:		bonus
 
 # Clean object files and executable
 clean:
-			@echo "${CLEAR}"
+			@echo "${CLEAR}\c"
 			@${S_OBJS}
 			@${RM} objs/
 			@sleep 0.3
-			@echo "${CLEAR}"
+			@echo "${CLEAR}\c"
 			@echo "${GREEN}✅ Simple clean completed! ✨\n"
 
 # Clean everything
@@ -159,7 +162,7 @@ fclean: clean
 			@${S_NAME}
 			@${RM} ${NAME}
 			@sleep 0.3
-			@echo "${CLEAR}"
+			@echo "${CLEAR}\c"
 			@echo "${GREEN}✅ Deep clean completed! ✨"
 
 ###############################################################################
@@ -169,65 +172,75 @@ fclean: clean
 # Drawings
 draw_begining:
 			@echo "${CLEAR}${CYAN}\c"
-			@cat ascii_art/title
-			@sleep 0.3
-			@echo "${CLEAR}${GRAY}\c"
-			@cat ascii_art/by
-			@sleep 0.3
-			@echo "${CLEAR}${GREEN}\c"
-			@cat ascii_art/owner
-			@sleep 0.3
+			@cat ascii_art/prog_name | \
+				while IFS= read -r line; do \
+					printf '%s\n' "$$line"; \
+					sleep 0.01; \
+				done; \
+				printf '%s' "$$line"
+			@sleep 0.7
 			@echo "${CLEAR}"
 
 draw_bonus:
-			@echo "${CLEAR}"
-			@echo "${BLUE}"
-			@echo "                         ###         ###      ###    \`#    \`##+    .#\'         :##:       \'##"
-			@sleep 0.01
-			@echo "               :;;;;;;;;;\`@@#  ;;;;;;\`@@# ;;; @@\`;;;\`#\`;;:\`#@#\`;;:.+\`.;;;;;;;;,;@@:   ,;;.+@@"
-			@sleep 0.01
-			@echo "               ;;;\` ;;;;; @@\`;;;;;;;;;\`@@ ;;; @@ ;;;\`#\`;;;\`@@#\`;;:.+\`;;: .;;;;,;@@:   ,;;.+@@"
-			@sleep 0.01
-			@echo "              ;;;\`#@\`;;;\`#\` ;;;;;;;;;; @ ;;;; @\`;;;\`#\`;;;\`@@#\`;;:.+.;;:,@\'.;;,:@@:   ,;;.\'@@."
-			@sleep 0.01
-			@echo "              ;;;\`#@\`;;; @ ;;;   ;;;;; @ ;;;;; ;;;; # ;;;\`@@#\`;;:.+\`;;:,@\'    :@@:   ,;;.\'@@."
-			@sleep 0.01
-			@echo "             :;;\`#@\`;;;\`#\`;;; @@@ ;;; @ ;;;;;;;;;;\`#\`;;;\`@@#\`;;;.+\`;;:,@@\'          ,;;.\'@@."
-			@sleep 0.01
-			@echo "             :;;;\` ;;;; @ ;;; @@@ ;;; @ ;;;;;;;;;; @ ;;;\`@@#\`;;;.+\`;;;:     :@@:    ,;;.\'@@."
-			@sleep 0.01
-			@echo "            :;;;;;;;;; # ;;; @@@ ;;; @ ;;;;;;;;;;\`@ ;;;\`@@#\`;;;\`+\`;;;;;;;;;,:@@;   ,;;.\'@@."
-			@sleep 0.01
-			@echo "            ;;;\` ;;;;; # ;;; @@@ ;;; @ ;;;;;;;;;; @ ;;;\`@@#\`;;;\`+     .;;;;,:@@:   ,;;.\'@@."
-			@sleep 0.01
-			@echo "           :;;\`#@\`;;; #\`;;; @@@ ;;; @ ;;;;;;;;;; @ ;;;\`@@#\`;;;\`@@+     .;;,:@@;   ,;;.\'@@,"
-			@sleep 0.01
-			@echo "           :;;\`#@\`;;; #\`;;; @@@ ;;; @ ;;;;;;;;;; @ ;;;\`@@#\`;;;\`@@+     .;;,:@@;   ,;;.\'@@,"
-			@sleep 0.01
-			@echo "          :;;\`#@\`;;;\`#\`;;; @@@ ;;; @ ;;;; ;;;;; @ ;;;\`@@#\`;;;\`@@+     .;;,:@@;   ,;;.\'@@,"
-			@sleep 0.01
-			@echo "          :;;\`#@\`;;; #\`;;;;   ;;;; @ ;;; @ ;;;; @ ;;;\`@@#\`;;;\`#    .@+.;;,:@@;       \'@@,"
-			@sleep 0.01
-			@echo "         :;;;;\` ;;;\`#\`;;;;;;;;;;  @ ;;; @@ ;;; @ ;;;;;  \`;;;\`#\`;;;;: .;;:,@@;"
-			@sleep 0.01
-			@echo "         :;;;;;;;;;\`#@\`;;;;;;;; @@@ ;;; @@ ;;; @ ;;;;;;;;;;;\`#\`;;;;;;;;: ,@@;"
-			@sleep 0.01
-			@echo "        :;;;;;;;;;\`#@\`  ;;;;;; @@@ ;;; @@@ ;; @@@ ;;;;;;;; \`@#\`;;;;;;;:,@@\'        ;@@,"
-			@sleep 0.01
-			@echo "                  #@\`         @@@      @@@    @@@        \`@@#          ,@@\'        ;@@,"
+			@echo "${CLEAR}${BLUE}\c"
+			@cat ascii_art/bonus | \
+				while IFS= read -r line; do \
+					printf '%s\n' "$$line"; \
+					sleep 0.01; \
+				done; \
+				printf '%s' "$$line"
 			@sleep 0.3
 			@echo "${ENDCOLOR}"
 
 draw_ready:
 			@echo "${CLEAR}${GREEN}${BOLD}\c"
-			@cat ascii_art/prog_ready
+			@cat ascii_art/prog_ready | \
+				while IFS= read -r line; do \
+					printf '%s\n' "$$line"; \
+					sleep 0.01; \
+				done; \
+				printf '%s' "$$line"
+			@sleep 0.3
 			@echo "${ENDCOLOR}"
 			@make help PRINT_SCREEN=NO
+
+draw_run:
+			@for i in 1 2 3; do \
+				echo "${CLEAR}${BLUE}${BOLD}\c"; \
+				cat "ascii_art/prog_running_$$i"; \
+				echo "${ENDCOLOR}"; \
+				sleep 0.3; \
+			done
+
+draw_help:
+			@echo "${GRAY}${BOLD}\c"
+			@cat ascii_art/help_me | \
+				while IFS= read -r line; do \
+					printf '%s\n' "$$line"; \
+				done; \
+				printf '%s' "$$line"
+			@echo "${ENDCOLOR}"
+
+draw_norm_yes:
+			@echo "${CLEAR}${GRAY}${BOLD}\c"
+			@cat ascii_art/obama
+			@echo "${ENDCOLOR}"
+
+draw_norm_no:
+			@echo "${CLEAR}${GRAY}${BOLD}\c"
+			@cat ascii_art/obama_sad
+			@echo "${ENDCOLOR}"
 
 # Build rule for help function
 help:
 			@if [ "${PRINT_SCREEN}" = "YES" ]; then \
 				echo "${CLEAR}\c"; \
+				$(MAKE) draw_help; \
+				for i in 3 2 1 0; do \
+					printf '\r${BLUE}Help will be shown in: %d${ENDCOLOR}' "$$i"; \
+					sleep 1; \
+					printf '${CLEARLN}'; \
+				done; \
 			fi
 			@echo "${GRAY}🏃 Run ${ITALIC}\`./${NAME} <number_of_philosophers> <time_to_die> <time_to_eat> <time_to_sleep> {<number_of_times_each_philosopher_must_eat>}\`${ENDCOLOR}${GRAY} to start the program. 🚀\n"
 			@echo "${BOLD}${UNDERLINE}💡 TIPS: 💡${ENDCOLOR}${GRAY}"
@@ -243,7 +256,8 @@ h:		help
 
 # Norminette
 norm:
-			@norminette srcs && norminette includes
+			@$(MAKE) draw_norm_yes && norminette ${SRCSDIR} && norminette ${HDRDIR} || $(MAKE) draw_norm_no && norminette ${SRCSDIR} && norminette ${HDRDIR}
+
 n:		norm
 
 # Leaks
