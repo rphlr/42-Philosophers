@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/05/25 15:50:18 by rrouille         ###   ########.fr        #
+#    Updated: 2023/05/25 15:51:13 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -105,7 +105,6 @@ ${NAME}: ${OBJS}
 
 # Run the program
 run:	clear ${NAME} draw_run
-#	@${call shuffle_animation}
 			@echo "${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
 			@./${NAME} ${ARGS}
 r:		clear ${NAME} draw_run
