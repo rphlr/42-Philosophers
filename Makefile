@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/05/25 15:44:40 by rrouille         ###   ########.fr        #
+#    Updated: 2023/05/25 15:49:51 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -270,16 +270,20 @@ l:		clear ${NAME}
 
 # Run the program with lldb
 lldb:	clear ${NAME}
-			@echo "${CLEAR}"
+			@echo "${CLEAR}\c"
 			@lldb ./${NAME} ${ARGS}
 			@echo "${CLEAR}"
 
 # Push the files to Git
-git:	fclean
-			@echo "${CLEAR}"
+git: fclean
+			@echo "${CLEAR}\c"
 			@git add .
 			@echo "${CYAN}✅ Added files to git! 📁"
-			@git commit -m "💻 Auto-commit"
+			@if [ -z "${ARGS}" ]; then \
+				git commit -m "💻 Auto-commit"; \
+			else \
+				git commit -m "${ARGS}"; \
+			fi
 			@echo "${BLUE}✅ Changes committed! ✔️"
 			@git push
 			@echo "${GREEN}✅ All changes are now on GitHub! 🚀${ENDCOLOR}"
