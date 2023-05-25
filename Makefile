@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/05/25 15:51:13 by rrouille         ###   ########.fr        #
+#    Updated: 2023/05/25 16:11:16 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -255,7 +255,7 @@ h:		help
 
 # Norminette
 norm:
-			@$(MAKE) draw_norm_yes && norminette ${SRCSDIR} && norminette ${HDRDIR} || $(MAKE) draw_norm_no && norminette ${SRCSDIR} && norminette ${HDRDIR}
+			@norminette ${SRCSDIR} >/dev/null 2>&1 && norminette ${HDRDIR} >/dev/null 2>&1 && $(MAKE) draw_norm_yes || $(MAKE) draw_norm_no && norminette ${SRCSDIR} && norminette ${HDRDIR}
 
 n:		norm
 
