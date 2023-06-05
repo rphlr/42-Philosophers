@@ -6,41 +6,11 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/17 11:42:08 by rrouille          #+#    #+#             */
-/*   Updated: 2023/05/30 19:01:55 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/05 18:35:49 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "philosophers.h"
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
-typedef enum e_status
-{
-	IS_SLEEPING,
-	IS_THINKING,
-	IS_EATING
-}	t_status;
-
-typedef struct s_philos
-{
-	int				curr_philo;
-	bool			right_fork_free;
-	bool			left_fork_free;
-	t_status		status;
-	struct s_philos	*prev;
-	struct s_philos	*next;
-}	t_philos;
-
-typedef struct s_state
-{
-	int			nbr_of_philo;
-	int			nbr_of_fork;
-	int			max_eat;
-	int			time_to_eat;
-	int			time_to_sleep;
-	int			time_to_die;
-}	t_state;
+#include "philosophers.h"
 
 int	ft_atoi(const char *str)
 {
@@ -83,7 +53,11 @@ void	init(int ac, char **av)
 	curr_philo.right_fork_free = true;
 	curr_philo.left_fork_free = true;
 	curr_philo.status = IS_THINKING;
-	printf("max_eat =  %i\nnbr_of_philo =  %i\nnbr_of_fork =  %i\ntime_to_die =  %i\ntime_to_eat =  %i\ntime_to_sleep =  %i\ncurr_state = %i\n", global_state.max_eat, global_state.nbr_of_philo,	global_state.nbr_of_fork, global_state.time_to_die, global_state.time_to_eat, 	global_state.time_to_sleep, curr_philo.status);
+	printf("max_eat =  %i\nnbr_of_philo =  %i\nnbr_of_fork = \
+	%i\ntime_to_die =  %i\ntime_to_eat =  %i\ntime_to_sleep =  \
+	%i\ncurr_state = %i\n", global_state.max_eat, global_state.nbr_of_philo, \
+	global_state.nbr_of_fork, global_state.time_to_die, \
+	global_state.time_to_eat, global_state.time_to_sleep, curr_philo.status);
 }
 
 bool	check_int(char *cur_arg_value)
