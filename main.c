@@ -6,11 +6,39 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/17 11:42:08 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/05 18:35:49 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/08 15:33:40 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+void	*philosopher_action(void *ag)
+{
+	t_philosophers	*philosopher;
+
+	philosopher = (t_philosophers *) ag;
+	while (!philosopher->death)
+	{
+		philosopher->status = IS_THINKING;
+
+		philosopher->status = IS_SLEEPING;
+
+		philosopher->status = IS_EATING;
+		pthread_mutex_lock(philosopher->left_fork);
+		pthread_mutex_lock(philosopher->right_fork);
+
+
+		pthread_mutex_unlock(philosopher->left_fork);
+		pthread_mutex_unlock(philosopher->right_fork);
+		if (philosopher->max_eat > 0 && philosopher->curr_philo >= \
+		philosopher->max_eat)
+		{
+			philosopher->max_eat_reached = true;
+			break ;
+		}
+	}
+	return (NULL);
+}
 
 int	ft_atoi(const char *str)
 {
@@ -36,28 +64,45 @@ int	ft_atoi(const char *str)
 	return (result * is_minus);
 }
 
-void	init(int ac, char **av)
+int	initiate_philosophers(int ac, char **av)
 {
-	t_state		global_state;
-	t_philos	curr_philo;
+	int				i;
+	int				max_eat;
+	t_state			state;
+	t_philosophers	*philosopher;
+	pthread_t		*thread;
 
+	max_eat = -1;
 	if (ac == 6)
-		global_state.max_eat = ft_atoi(av[ac - 1]);
-	if (ac == 5)
-		global_state.max_eat = -1;
-	global_state.nbr_of_philo = ft_atoi(av[1]);
-	global_state.nbr_of_fork = ft_atoi(av[1]);
-	global_state.time_to_die = ft_atoi(av[2]);
-	global_state.time_to_eat = ft_atoi(av[3]);
-	global_state.time_to_sleep = ft_atoi(av[4]);
-	curr_philo.right_fork_free = true;
-	curr_philo.left_fork_free = true;
-	curr_philo.status = IS_THINKING;
-	printf("max_eat =  %i\nnbr_of_philo =  %i\nnbr_of_fork = \
-	%i\ntime_to_die =  %i\ntime_to_eat =  %i\ntime_to_sleep =  \
-	%i\ncurr_state = %i\n", global_state.max_eat, global_state.nbr_of_philo, \
-	global_state.nbr_of_fork, global_state.time_to_die, \
-	global_state.time_to_eat, global_state.time_to_sleep, curr_philo.status);
+		max_eat = ft_atoi(av[ac - 1]);
+	i = -1;
+	state.forks = malloc(state.nbr_of_fork * sizeof(pthread_mutex_t));
+	while (++i < state.nbr_of_fork)
+		pthread_mutex_init(&state.forks[i], NULL);
+	philosopher = malloc(state.nbr_of_philo * sizeof(t_philosophers));
+	i = -1;
+	while (++i < state.nbr_of_philo)
+	{
+		philosopher[i].curr_philo = i;
+		philosopher[i].max_eat = max_eat;
+		philosopher[i].death = false;
+		philosopher[i].max_eat_reached = false;
+		philosopher[i].status = IS_THINKING;
+		philosopher[i].right_fork = &state.forks[i];
+		philosopher[i].left_fork = &state.forks[(i + 1) % state.nbr_of_fork];
+		philosopher[i].next = &philosopher[(i + 1) % state.nbr_of_philo];
+	}
+	thread = malloc(state.nbr_of_philo * sizeof(pthread_t));
+	i = -1;
+	while (++i < state.nbr_of_philo)
+		pthread_create(&thread[i], NULL, philosopher_action, &philosopher[i]);
+	i = -1;
+	while (++i < state.nbr_of_philo)
+		pthread_join(thread[i], NULL);
+	free(state.forks);
+	free(philosopher);
+	free(thread);
+	return (0);
 }
 
 bool	check_int(char *cur_arg_value)
@@ -100,6 +145,6 @@ int	main(int ac, char **av)
 	else
 	{
 		printf("OK\n");
-		init(ac, av);
+		initiate_philosophers(ac, av);
 	}
 }
