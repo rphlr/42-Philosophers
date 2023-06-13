@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/05/30 16:55:56 by rrouille         ###   ########.fr        #
+#    Updated: 2023/06/10 14:17:56 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ PRINT_SCREEN	= YES
 
 # Directories
 SRCSDIR			= ./
-OBJSDIR			= objs
+OBJSDIR			= objs/
 HDRDIR			= ./
 SRCSBNSDIR		= ./philo_bonus
 OBJSBNSDIR		= objs/philo_bonus
@@ -104,12 +104,20 @@ ${NAME}: ${OBJS}
 			@sleep 0.5
 
 # Run the program
-run:	clear ${NAME} draw_run
+run:	clear ${NAME}
 			@echo "${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
 			@./${NAME} ${ARGS}
-r:		clear ${NAME} draw_run
+r:		clear ${NAME}
 			@echo "${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
 			@./${NAME} ${ARGS}
+
+# Count eat times
+count:	clear ${NAME}
+			@echo "${GREEN}🍴 Number of meal received by philosophers: 🍴${ENDCOLOR}"
+			@./${NAME} ${ARGS} | grep "1 is eating" | wc -l
+c:		clear ${NAME}
+			@echo "${GREEN}🍴 Number of meal received by philosophers: 🍴${ENDCOLOR}"
+			@./${NAME} ${ARGS} | grep "1 is eating" | wc -l
 
 # Tests
 test:
@@ -120,12 +128,12 @@ t:
 			@cd tester && bash loop.sh ${ARGS}
 
 # Check if the program is correct
-check:	clear ${NAME}
-			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
-			@./${NAME} ${ARGS} | ./checker_Mac ${ARGS}
-c:		clear ${NAME}
-			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
-			@./${NAME} ${ARGS} | ./checker_Mac ${ARGS}
+#check:	clear ${NAME}
+#			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
+#			@./${NAME} ${ARGS} | ./checker_Mac ${ARGS}
+#c:		clear ${NAME}
+#			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
+#			@./${NAME} ${ARGS} | ./checker_Mac ${ARGS}
 
 # Bonus
 bonus:	draw_bonus ${OBJSBNS}
@@ -298,4 +306,4 @@ clear:
 # Rebuild the program
 re: fclean all
 
-.PHONY: all clean fclean re run test
+.PHONY: all clean fclean re run test bonus help norm leaks lldb git clear c
