@@ -283,7 +283,7 @@ void	overseer(t_philo *philosophers)
 		{
 			usleep(1000);
 			printf(GREEN""ITALIC""UNDERLINE""STOP_SIMULATION""RESET,
-				philosophers->config.eating_count);
+				   philosophers->config.eating_count);
 			break ;
 		}
 		philosophers = philosophers->next;
@@ -400,7 +400,7 @@ int	ft_isdigit(int number)
 int	ft_isspace(int c)
 {
 	return (c == '\t' || c == '\n' || c == '\v'
-		|| c == '\f' || c == '\r' || c == ' ');
+			|| c == '\f' || c == '\r' || c == ' ');
 }
 
 int	ft_strlen(char *str)
