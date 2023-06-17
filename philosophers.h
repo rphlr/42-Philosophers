@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/05 15:33:06 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/12 12:40:37 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/17 08:01:54 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,29 +96,34 @@ typedef struct s_philosopher
 	void			*prev;
 }	t_philo;
 
-void		init(int ac, char **av);
-void		*life_cycle(void *p);
-long int	get_time(void);
-void		sleep_ms(long int ms);
-long int	sec_to_ms(long int sec);
-long int	usec_to_ms(long int microseconde);
-long int	get_time_diff(long int start, long int end);
-void		overseer(t_philo *philosophers);
-long int	get_rel_time(long int start_time);
-int			should_stop(t_philo *philosophers);
-void		free_all(t_philo *philosophers);
-void		philosophers_eat(t_philo *philosophers);
-void		_sleep(t_philo *philosophers);
-void		_think(t_philo *philosophers);
-void		_die(t_philo *philosophers);
-int			can_pick_fork(t_philo *philosophers, pthread_mutex_t *fork_mutex);
-int			can_eat(t_philo *philosophers);
-void		print_status(t_philo *philosophers, char *status);
-t_table		create_table(void);
-int		ft_atoi(const char *str);
-void	*ft_calloc(size_t count, size_t size);
-int		ft_isdigit(int number);
-int		ft_isspace(int c);
-int		ft_strlen(char *str);
+void			init(int ac, char **av);
+void			*life_cycle(void *p);
+long int		get_time(void);
+void			sleep_ms(long int ms);
+long int		sec_to_ms(long int sec);
+long int		usec_to_ms(long int microseconde);
+long int		get_time_diff(long int start, long int end);
+void			overseer(t_philo *philosophers);
+long int		get_rel_time(long int start_time);
+int				should_stop(t_philo *philosophers);
+void			free_philosopher(t_philo *philosophers);
+void			free_philosophers(t_philo *philosophers);
+void			_eat(t_philo *philosophers);
+void			_sleep(t_philo *philosophers);
+void			_think(t_philo *philosophers);
+void			_die(t_philo *philosophers);
+int				can_pick_fork(t_philo *philosophers, pthread_mutex_t *fork_mutex);
+int				can_eat(t_philo *philosophers);
+void			print_status(t_philo *philosophers, char *status);
+t_table			create_table(void);
+t_philo_config	create_config(int ac, char **av);
+int				ft_atoi(const char *str);
+void			*ft_calloc(size_t count, size_t size);
+int				ft_isdigit(int number);
+int				ft_isspace(int c);
+int				ft_strlen(char *str);
+void			create_thread(t_philo *philosophers);
+t_philo			*save_last(t_philo *philosophers);
+t_philo			*create_philos(t_philo *prev, t_philo_config config, int i, t_table *table);
 
 #endif

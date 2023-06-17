@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 21:13:14 by dgloriod          #+#    #+#             */
-/*   Updated: 2023/06/13 11:32:32 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/17 08:01:35 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	can_eat(t_philo *philosophers)
 	return (philosophers->n_eat < philosophers->config.eating_count);
 }
 
-void	philosophers_eat(t_philo *philosophers)
+void	_eat(t_philo *philosophers)
 {
 	t_philo	*next;
 
@@ -89,7 +89,7 @@ void	_think(t_philo *philosophers)
 	}
 }
 
-static t_philo_config	create_config(int ac, char **av)
+t_philo_config	create_config(int ac, char **av)
 {
 	t_philo_config	config;
 
@@ -98,7 +98,8 @@ static t_philo_config	create_config(int ac, char **av)
 	config.time_until_death = ft_atoi(av[2]);
 	config.time_to_eat = ft_atoi(av[3]);
 	config.time_to_sleep = ft_atoi(av[4]);
-	if (config.time_to_sleep < 1 || config.time_to_eat < 1 || config.total_philosophers < 1 || config.time_until_death < 1)
+	if (config.time_to_sleep < 1 || config.time_to_eat < 1
+		|| config.total_philosophers < 1 || config.time_until_death < 1)
 		config.error = 1;
 	if (ac == 6)
 	{
@@ -111,7 +112,7 @@ static t_philo_config	create_config(int ac, char **av)
 	return (config);
 }
 
-static t_philo	*create_philos(t_philo *prev, t_philo_config config, \
+t_philo	*create_philos(t_philo *prev, t_philo_config config, \
 int i, t_table *table)
 {
 	t_philo	*philosophers;
@@ -137,7 +138,7 @@ int i, t_table *table)
 	return (philosophers);
 }
 
-static void	create_thread(t_philo *philosophers)
+void	create_thread(t_philo *philosophers)
 {
 	while (philosophers->id < philosophers->config.total_philosophers)
 	{
@@ -147,7 +148,7 @@ static void	create_thread(t_philo *philosophers)
 	pthread_create(&philosophers->thread, NULL, &life_cycle, philosophers);
 }
 
-static t_philo	*save_last(t_philo *philosophers)
+t_philo	*save_last(t_philo *philosophers)
 {
 	t_philo	*last;
 
@@ -161,9 +162,9 @@ static t_philo	*save_last(t_philo *philosophers)
 
 void	init(int ac, char **av)
 {
-	t_philo		*philosophers;
+	t_philo			*philosophers;
 	t_philo_config	config;
-	t_table		table;
+	t_table			table;
 
 	config = create_config(ac, av);
 	if (config.error)
@@ -200,7 +201,7 @@ void	print_status(t_philo *philosophers, char *status)
 	printf(status, get_rel_time(philosophers->table->start_time), philosophers->id);
 }
 
-static void	remove_one(t_philo *philosophers)
+void	free_philosopher(t_philo *philosophers)
 {
 	pthread_mutex_destroy(&philosophers->fork_mutex);
 	pthread_join(philosophers->thread, NULL);
@@ -209,7 +210,7 @@ static void	remove_one(t_philo *philosophers)
 	philosophers = NULL;
 }
 
-void	free_all(t_philo *philosophers)
+void	free_philosophers(t_philo *philosophers)
 {
 	t_philo	*iter;
 	int		total_philosophers;
@@ -219,7 +220,7 @@ void	free_all(t_philo *philosophers)
 	{
 		if (philosophers->next)
 			iter = philosophers->next;
-		remove_one(philosophers);
+		free_philosopher(philosophers);
 		if (iter)
 			philosophers = iter;
 	}
@@ -236,7 +237,7 @@ void	*life_cycle(void *p)
 	{
 		if (!should_stop(philosophers))
 		{
-			philosophers_eat(philosophers);
+			_eat(philosophers);
 			_sleep(philosophers);
 			_think(philosophers);
 		}
@@ -246,22 +247,13 @@ void	*life_cycle(void *p)
 	return (NULL);
 }
 
-static int	have_the_time(t_philo *philosophers)
-{
-	return ((get_time() - philosophers->last_meal_time) < philosophers->config.time_until_death);
-}
-
-static int	reach_number_of_eat(t_philo *philosophers)
-{
-	return (philosophers->n_eat >= philosophers->config.eating_count && \
-	philosophers->config.eating_count >= 1);
-}
-
 int	should_stop(t_philo *philosophers)
 {
-	if (!have_the_time(philosophers))
+	if (!((get_time() - philosophers->last_meal_time) <
+		philosophers->config.time_until_death))
 		philosophers->table->should_stop = DEAD;
-	else if (reach_number_of_eat(philosophers))
+	else if ((philosophers->n_eat >= philosophers->config.eating_count &&
+	philosophers->config.eating_count >= 1))
 		philosophers->table->should_stop = EAT_REACHED;
 	else
 		philosophers->table->should_stop = CONTINUE;
@@ -288,7 +280,7 @@ void	overseer(t_philo *philosophers)
 		}
 		philosophers = philosophers->next;
 	}
-	free_all(philosophers);
+	free_philosophers(philosophers);
 }
 
 t_table	create_table(void)
