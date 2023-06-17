@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/14 21:13:14 by dgloriod          #+#    #+#             */
-/*   Updated: 2023/06/17 08:01:35 by rrouille         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philosophers.h"
 
 int	main(int ac, char **av)
@@ -36,11 +24,6 @@ int	can_pick_fork(t_philo *philosophers, pthread_mutex_t *fork_mutex)
 	return (0);
 }
 
-int	can_eat(t_philo *philosophers)
-{
-	return (philosophers->n_eat < philosophers->config.eating_count);
-}
-
 void	_eat(t_philo *philosophers)
 {
 	t_philo	*next;
@@ -54,9 +37,9 @@ void	_eat(t_philo *philosophers)
 			philosophers->state = EAT_;
 			print_status(philosophers, YELLOW""EATING""RESET);
 			philosophers->last_meal_time = get_time();
-			if (philosophers->config.eating_count > 0)
+			if (philosophers->running.eating_count > 0)
 				philosophers->n_eat += 1;
-			sleep_ms(philosophers->config.time_to_eat);
+			sleep_ms(philosophers->running.time_to_eat - 45);
 		}
 	}
 	pthread_mutex_unlock(&philosophers->fork_mutex);
@@ -69,13 +52,13 @@ void	_sleep(t_philo *philosophers)
 	{
 		philosophers->state = SLEEP_;
 		print_status(philosophers, MAGENTA""SLEEPING""RESET);
-		sleep_ms(philosophers->config.time_to_sleep);
+		sleep_ms(philosophers->running.time_to_sleep);
 	}
 }
 
 void	_die(t_philo *philosophers)
 {
-	philosophers->table->should_stop = DEAD;
+	philosophers->utils->should_stop = DEAD;
 	usleep(1000);
 	print_status(philosophers, RED""_DEAD""RESET);
 }
@@ -89,31 +72,31 @@ void	_think(t_philo *philosophers)
 	}
 }
 
-t_philo_config	create_config(int ac, char **av)
+t_running	create_running(int ac, char **av)
 {
-	t_philo_config	config;
+	t_running	running;
 
-	config.error = 0;
-	config.total_philosophers = ft_atoi(av[1]);
-	config.time_until_death = ft_atoi(av[2]);
-	config.time_to_eat = ft_atoi(av[3]);
-	config.time_to_sleep = ft_atoi(av[4]);
-	if (config.time_to_sleep < 1 || config.time_to_eat < 1
-		|| config.total_philosophers < 1 || config.time_until_death < 1)
-		config.error = 1;
+	running.error = 0;
+	running.total_philosophers = ft_atoi(av[1]);
+	running.time_until_death = ft_atoi(av[2]);
+	running.time_to_eat = ft_atoi(av[3]);
+	running.time_to_sleep = ft_atoi(av[4]);
+	if (running.time_to_sleep < 1 || running.time_to_eat < 1
+		|| running.total_philosophers < 1 || running.time_until_death < 1)
+		running.error = 1;
 	if (ac == 6)
 	{
-		config.eating_count = ft_atoi(av[5]);
-		if (config.eating_count < 1)
-			config.error = 1;
+		running.eating_count = ft_atoi(av[5]);
+		if (running.eating_count < 1)
+			running.error = 1;
 	}
 	else
-		config.eating_count = 0;
-	return (config);
+		running.eating_count = 0;
+	return (running);
 }
 
-t_philo	*create_philos(t_philo *prev, t_philo_config config, \
-int i, t_table *table)
+t_philo	*create_philos(t_philo *prev, t_running running, \
+int i, t_utils *utils)
 {
 	t_philo	*philosophers;
 
@@ -121,9 +104,9 @@ int i, t_table *table)
 	if (!philosophers)
 		return (NULL);
 	philosophers->id = i + 1;
-	philosophers->config = config;
+	philosophers->running = running;
 	philosophers->last_meal_time = get_time();
-	philosophers->table = table;
+	philosophers->utils = utils;
 	philosophers->n_eat = 0;
 	if (philosophers->id % 2)
 		philosophers->state = WAIT_START;
@@ -131,8 +114,8 @@ int i, t_table *table)
 		philosophers->state = WAIT_EAT;
 	pthread_mutex_init(&philosophers->fork_mutex, NULL);
 	philosophers->prev = prev;
-	if (++i < config.total_philosophers)
-		philosophers->next = create_philos(philosophers, config, i, table);
+	if (++i < running.total_philosophers)
+		philosophers->next = create_philos(philosophers, running, i, utils);
 	else
 		philosophers->next = NULL;
 	return (philosophers);
@@ -140,7 +123,7 @@ int i, t_table *table)
 
 void	create_thread(t_philo *philosophers)
 {
-	while (philosophers->id < philosophers->config.total_philosophers)
+	while (philosophers->id < philosophers->running.total_philosophers)
 	{
 		pthread_create(&philosophers->thread, NULL, &life_cycle, philosophers);
 		philosophers = philosophers->next;
@@ -148,7 +131,7 @@ void	create_thread(t_philo *philosophers)
 	pthread_create(&philosophers->thread, NULL, &life_cycle, philosophers);
 }
 
-t_philo	*save_last(t_philo *philosophers)
+t_philo	*last_philo(t_philo *philosophers)
 {
 	t_philo	*last;
 
@@ -162,20 +145,20 @@ t_philo	*save_last(t_philo *philosophers)
 
 void	init(int ac, char **av)
 {
-	t_philo			*philosophers;
-	t_philo_config	config;
-	t_table			table;
+	t_philo		*philosophers;
+	t_running	running;
+	t_utils		utils;
 
-	config = create_config(ac, av);
-	if (config.error)
+	running = create_running(ac, av);
+	if (running.error)
 	{
 		printf(RED""BOLD""UNDERLINE""ERR_INVALID_ARGS""RESET);
 		return ;
 	}
-	table = create_table();
-	philosophers = create_philos(NULL, config, 0, &table);
-	philosophers = save_last(philosophers);
-	philosophers->table->start_time = get_time();
+	utils = create_utils();
+	philosophers = create_philos(NULL, running, 0, &utils);
+	philosophers = last_philo(philosophers);
+	philosophers->utils->start_time = get_time();
 	while (philosophers->id != 1)
 		philosophers = philosophers->next;
 	create_thread(philosophers);
@@ -194,17 +177,18 @@ int	ft_strcmp(char *s1, char *s2)
 
 void	print_status(t_philo *philosophers, char *status)
 {
-	if (philosophers->table->should_stop != CONTINUE && ft_strcmp(status, RED""_DEAD""RESET))
-		return;
+	if (philosophers->utils->should_stop != CONTINUE && ft_strcmp(status, RED""_DEAD""RESET))
+		return ;
 	else if (!ft_strcmp(status, RED""_DEAD""RESET))
-		philosophers->table->should_stop = DEAD;
-	printf(status, get_rel_time(philosophers->table->start_time), philosophers->id);
+		philosophers->utils->should_stop = DEAD;
+	printf(status, get_rel_time(philosophers->utils->start_time), philosophers->id);
 }
 
 void	free_philosopher(t_philo *philosophers)
 {
 	pthread_mutex_destroy(&philosophers->fork_mutex);
-	pthread_join(philosophers->thread, NULL);
+	if (philosophers->running.total_philosophers > 1)
+		pthread_join(philosophers->thread, NULL);
 	if (philosophers)
 		free(philosophers);
 	philosophers = NULL;
@@ -215,7 +199,12 @@ void	free_philosophers(t_philo *philosophers)
 	t_philo	*iter;
 	int		total_philosophers;
 
-	total_philosophers = philosophers->config.total_philosophers + 1;
+	if (philosophers->running.total_philosophers == 1)
+	{
+		free_philosopher(philosophers);
+		return ;
+	}
+	total_philosophers = philosophers->running.total_philosophers + 1;
 	while (--total_philosophers && philosophers)
 	{
 		if (philosophers->next)
@@ -232,7 +221,7 @@ void	*life_cycle(void *p)
 
 	philosophers = (t_philo *) p;
 	if (philosophers->state == WAIT_START)
-		sleep_ms(philosophers->config.time_to_eat / 2);
+		sleep_ms(philosophers->running.time_to_eat / 2);
 	while (1)
 	{
 		if (!should_stop(philosophers))
@@ -250,14 +239,12 @@ void	*life_cycle(void *p)
 int	should_stop(t_philo *philosophers)
 {
 	if (!((get_time() - philosophers->last_meal_time) <
-		philosophers->config.time_until_death))
-		philosophers->table->should_stop = DEAD;
-	else if ((philosophers->n_eat >= philosophers->config.eating_count &&
-	philosophers->config.eating_count >= 1))
-		philosophers->table->should_stop = EAT_REACHED;
-	else
-		philosophers->table->should_stop = CONTINUE;
-	return (philosophers->table->should_stop);
+		philosophers->running.time_until_death))
+		philosophers->utils->should_stop = DEAD;
+	else if ((philosophers->n_eat > philosophers->running.eating_count &&
+	philosophers->running.eating_count > 1))
+		philosophers->utils->should_stop = EAT_REACHED;
+	return (philosophers->utils->should_stop);
 }
 
 void	overseer(t_philo *philosophers)
@@ -266,16 +253,21 @@ void	overseer(t_philo *philosophers)
 		philosophers = philosophers->next;
 	while (1)
 	{
-		if (philosophers->table->should_stop == DEAD)
+		if (philosophers->utils->should_stop == DEAD)
 		{
 			_die(philosophers);
 			break ;
 		}
-		else if (philosophers->table->should_stop == EAT_REACHED)
+		else if (philosophers->utils->should_stop == EAT_REACHED)
 		{
 			usleep(1000);
 			printf(GREEN""ITALIC""UNDERLINE""STOP_SIMULATION""RESET,
-				   philosophers->config.eating_count);
+				philosophers->running.eating_count);
+			break ;
+		}
+		else if (philosophers->utils->should_stop == CONTINUE && philosophers->running.total_philosophers == 1)
+		{
+			_die(philosophers);
 			break ;
 		}
 		philosophers = philosophers->next;
@@ -283,15 +275,15 @@ void	overseer(t_philo *philosophers)
 	free_philosophers(philosophers);
 }
 
-t_table	create_table(void)
+t_utils	create_utils(void)
 {
-	t_table	table;
+	t_utils	utils;
 
-	table.should_stop = 0;
-	table.has_finished = 0;
-	table.start_time = 0;
-	table.time_until_death = 0;
-	return (table);
+	utils.should_stop = 0;
+	utils.has_finished = 0;
+	utils.start_time = 0;
+	utils.time_until_death = 0;
+	return (utils);
 }
 
 long int	get_time(void)
@@ -392,7 +384,7 @@ int	ft_isdigit(int number)
 int	ft_isspace(int c)
 {
 	return (c == '\t' || c == '\n' || c == '\v'
-			|| c == '\f' || c == '\r' || c == ' ');
+		|| c == '\f' || c == '\r' || c == ' ');
 }
 
 int	ft_strlen(char *str)

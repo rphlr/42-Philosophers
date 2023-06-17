@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/05 15:33:06 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/17 08:01:54 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/17 12:53:45 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ enum e_conditions
 	DEAD
 };
 
-typedef struct s_philosophers_config
+typedef struct s_running
 {
 	int				total_philosophers;
 	int				time_until_death;
@@ -68,16 +68,16 @@ typedef struct s_philosophers_config
 	int				time_to_sleep;
 	int				eating_count;
 	int				error;
-}	t_philo_config;
+}	t_running;
 
-typedef struct s_table
+typedef struct s_utils
 {
 	int				should_stop;
 	long int		start_time;
 	int				has_finished;
 	long int		time_until_death;
 	void			*philosophers;
-}	t_table;
+}	t_utils;
 
 typedef struct s_philosopher
 {
@@ -85,8 +85,8 @@ typedef struct s_philosopher
 	long int		last_meal_time;
 	long int		current_time;
 	int				n_eat;
-	t_philo_config	config;
-	t_table			*table;
+	t_running		running;
+	t_utils			*utils;
 	int				thread_id;
 	int				fork_id;
 	int				state;
@@ -115,15 +115,15 @@ void			_die(t_philo *philosophers);
 int				can_pick_fork(t_philo *philosophers, pthread_mutex_t *fork_mutex);
 int				can_eat(t_philo *philosophers);
 void			print_status(t_philo *philosophers, char *status);
-t_table			create_table(void);
-t_philo_config	create_config(int ac, char **av);
+t_utils			create_utils(void);
+t_running	create_config(int ac, char **av);
 int				ft_atoi(const char *str);
 void			*ft_calloc(size_t count, size_t size);
 int				ft_isdigit(int number);
 int				ft_isspace(int c);
 int				ft_strlen(char *str);
 void			create_thread(t_philo *philosophers);
-t_philo			*save_last(t_philo *philosophers);
-t_philo			*create_philos(t_philo *prev, t_philo_config config, int i, t_table *table);
+t_philo			*last_philo(t_philo *philosophers);
+t_philo			*create_philos(t_philo *prev, t_running running, int i, t_utils *utils);
 
 #endif
