@@ -17,7 +17,7 @@ int	can_pick_fork(t_philo *philosophers, pthread_mutex_t *fork_mutex)
 		return (0);
 	if (!pthread_mutex_lock(fork_mutex))
 	{
-		if (!should_stop(philosophers))
+		if (!should_stop(philosophers) && philosophers->running.total_philosophers != 1)
 			print_status(philosophers, BLUE""TOOK_FORK""RESET);
 		return (1);
 	}
@@ -29,8 +29,8 @@ void	_eat(t_philo *philosophers)
 	t_philo	*next;
 
 	next = philosophers->next;
-	if (can_pick_fork(philosophers, &philosophers->fork_mutex) && \
-	can_pick_fork(philosophers, &next->fork_mutex))
+	if (can_pick_fork(philosophers, &philosophers->fork_mutex)
+		&& can_pick_fork(philosophers, &next->fork_mutex))
 	{
 		if (!should_stop(philosophers))
 		{
@@ -39,7 +39,7 @@ void	_eat(t_philo *philosophers)
 			philosophers->last_meal_time = get_time();
 			if (philosophers->running.eating_count > 0)
 				philosophers->n_eat += 1;
-			sleep_ms(philosophers->running.time_to_eat - 45);
+			sleep_ms(philosophers->running.time_to_eat, philosophers);
 		}
 	}
 	pthread_mutex_unlock(&philosophers->fork_mutex);
@@ -52,14 +52,13 @@ void	_sleep(t_philo *philosophers)
 	{
 		philosophers->state = SLEEP_;
 		print_status(philosophers, MAGENTA""SLEEPING""RESET);
-		sleep_ms(philosophers->running.time_to_sleep);
+		sleep_ms(philosophers->running.time_to_sleep, philosophers);
 	}
 }
 
 void	_die(t_philo *philosophers)
 {
 	philosophers->utils->should_stop = DEAD;
-	usleep(1000);
 	print_status(philosophers, RED""_DEAD""RESET);
 }
 
@@ -95,8 +94,8 @@ t_running	create_running(int ac, char **av)
 	return (running);
 }
 
-t_philo	*create_philos(t_philo *prev, t_running running, \
-int i, t_utils *utils)
+t_philo	*create_philos(t_philo *prev, t_running running,
+	int i, t_utils *utils)
 {
 	t_philo	*philosophers;
 
@@ -156,13 +155,25 @@ void	init(int ac, char **av)
 		return ;
 	}
 	utils = create_utils();
+	if (running.total_philosophers >= 87353)
+	{
+		printf(RED""BOLD""UNDERLINE""MAX_THREAD""RESET);
+		return ;
+	}
 	philosophers = create_philos(NULL, running, 0, &utils);
 	philosophers = last_philo(philosophers);
 	philosophers->utils->start_time = get_time();
 	while (philosophers->id != 1)
 		philosophers = philosophers->next;
 	create_thread(philosophers);
-	overseer(philosophers);
+	if (running.total_philosophers == 1)
+	{
+		print_status(philosophers, BLUE""TOOK_FORK""RESET);
+		sleep_ms(running.time_until_death, philosophers);
+		_die(philosophers);
+	}
+	else
+		overseer(philosophers);
 }
 
 int	ft_strcmp(char *s1, char *s2)
@@ -177,11 +188,13 @@ int	ft_strcmp(char *s1, char *s2)
 
 void	print_status(t_philo *philosophers, char *status)
 {
-	if (philosophers->utils->should_stop != CONTINUE && ft_strcmp(status, RED""_DEAD""RESET))
+	if (philosophers->utils->should_stop != CONTINUE
+		&& ft_strcmp(status, RED""_DEAD""RESET))
 		return ;
 	else if (!ft_strcmp(status, RED""_DEAD""RESET))
 		philosophers->utils->should_stop = DEAD;
-	printf(status, get_rel_time(philosophers->utils->start_time), philosophers->id);
+	printf(status, get_rel_time(philosophers->utils->start_time),
+		philosophers->id);
 }
 
 void	free_philosopher(t_philo *philosophers)
@@ -221,13 +234,17 @@ void	*life_cycle(void *p)
 
 	philosophers = (t_philo *) p;
 	if (philosophers->state == WAIT_START)
-		sleep_ms(philosophers->running.time_to_eat / 2);
+		sleep_ms(philosophers->running.time_to_eat / 2, philosophers);
 	while (1)
 	{
 		if (!should_stop(philosophers))
 		{
 			_eat(philosophers);
+			if (should_stop(philosophers))
+				break ;
 			_sleep(philosophers);
+			if (should_stop(philosophers))
+				break ;
 			_think(philosophers);
 		}
 		else
@@ -238,11 +255,11 @@ void	*life_cycle(void *p)
 
 int	should_stop(t_philo *philosophers)
 {
-	if (!((get_time() - philosophers->last_meal_time) <
-		philosophers->running.time_until_death))
+	if (!((get_time() - philosophers->last_meal_time)
+			< philosophers->running.time_until_death))
 		philosophers->utils->should_stop = DEAD;
-	else if ((philosophers->n_eat > philosophers->running.eating_count &&
-	philosophers->running.eating_count > 1))
+	else if ((philosophers->n_eat > philosophers->running.eating_count
+			&& philosophers->running.eating_count > 1))
 		philosophers->utils->should_stop = EAT_REACHED;
 	return (philosophers->utils->should_stop);
 }
@@ -260,14 +277,8 @@ void	overseer(t_philo *philosophers)
 		}
 		else if (philosophers->utils->should_stop == EAT_REACHED)
 		{
-			usleep(1000);
 			printf(GREEN""ITALIC""UNDERLINE""STOP_SIMULATION""RESET,
 				philosophers->running.eating_count);
-			break ;
-		}
-		else if (philosophers->utils->should_stop == CONTINUE && philosophers->running.total_philosophers == 1)
-		{
-			_die(philosophers);
 			break ;
 		}
 		philosophers = philosophers->next;
@@ -290,17 +301,17 @@ long int	get_time(void)
 {
 	long int		time;
 	long int		sec;
-	long int		microseconde;
+	long int		ms;
 	struct timeval	current_time;
 
 	gettimeofday(&current_time, NULL);
 	sec = sec_to_ms(current_time.tv_sec);
-	microseconde = usec_to_ms(current_time.tv_usec);
-	time = sec + microseconde;
+	ms = usec_to_ms(current_time.tv_usec);
+	time = sec + ms;
 	return (time);
 }
 
-void	sleep_ms(long int ms)
+void	sleep_ms(long int ms, t_philo *philosophers)
 {
 	long int	start_time;
 	long int	timer_ms;
@@ -309,6 +320,11 @@ void	sleep_ms(long int ms)
 	timer_ms = get_time_diff(start_time, get_time());
 	while (timer_ms < ms)
 	{
+		if (should_stop(philosophers))
+		{
+			philosophers->utils->should_stop = DEAD;
+			return ;
+		}
 		timer_ms = get_time_diff(start_time, get_time());
 		usleep(ms / 10);
 	}
@@ -324,9 +340,9 @@ long int	sec_to_ms(long int sec)
 	return (sec * 1000);
 }
 
-long int	usec_to_ms(long int microseconde)
+long int	usec_to_ms(long int ms)
 {
-	return (microseconde / 1000);
+	return (ms / 1000);
 }
 
 long int	get_time_diff(long int start, long int end)

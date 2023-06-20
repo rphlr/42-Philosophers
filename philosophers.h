@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/05 15:33:06 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/17 12:53:45 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/20 13:09:43 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,12 @@ int	main(int ac, char **av);
 
 # define ERR_INVALID_ARGS "⚠️\tOopsie daisy, we've got a snafu with some argument(s)! Give 'em a once-over and give it another go. Good luck! 😄\n"
 # define USAGE "⚠️\tUsage: ./philosopher number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n"
-# define TOOK_FORK "🍴\t%ld %d has taken a fork\n"
-# define EATING "😋\t%ld %d is eating\n"
-# define SLEEPING "🛌🏼\t%ld %d is sleeping\n"
-# define THINKING "💭\t%ld %d is thinking\n"
-# define _DEAD "⚰️\t%ld %d died\n"
+# define TOOK_FORK "🍴\t%ld\t[%d] has taken a fork.\n"
+# define EATING "😋\t%ld\t[%d] is eating.\n"
+# define SLEEPING "🛌🏼\t%ld\t[%d] is sleeping.\n"
+# define THINKING "💭\t%ld\t[%d] is thinking.\n"
+# define _DEAD "⚰️\t%ld\t[%d] died.\n"
+# define MAX_THREAD "⚠️\tWarning: too much threads...\n"
 # define STOP_SIMULATION "✅\tBrace yourselves, folks! The philosophers have decided to take a break from their feast. They've devoured their meals a grand total of [%d] time(s).\n"
 
 // FORMATING
@@ -79,7 +80,7 @@ typedef struct s_utils
 	void			*philosophers;
 }	t_utils;
 
-typedef struct s_philosopher
+typedef struct s_philo
 {
 	int				id;
 	long int		last_meal_time;
@@ -99,7 +100,7 @@ typedef struct s_philosopher
 void			init(int ac, char **av);
 void			*life_cycle(void *p);
 long int		get_time(void);
-void			sleep_ms(long int ms);
+void			sleep_ms(long int ms, t_philo *philosophers);
 long int		sec_to_ms(long int sec);
 long int		usec_to_ms(long int microseconde);
 long int		get_time_diff(long int start, long int end);

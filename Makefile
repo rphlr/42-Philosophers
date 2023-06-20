@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/06/10 14:17:56 by rrouille         ###   ########.fr        #
+#    Updated: 2023/06/19 14:56:09 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,7 +62,7 @@ SRCS			= ${shell find ${SRCSDIR} -maxdepth 1 -type f -name '*.c'}
 OBJS			= ${patsubst ${SRCSDIR}%,${OBJSDIR}%,${SRCS:%.c=%.o}}
 SRCSBNS			= ${shell find ${SRCSBNSDIR} -type f -name '*.c'}
 OBJSBNS			= ${patsubst ${SRCSBNSDIR}%,${OBJSBNSDIR}%,${SRCSBNS:%.c=%.o}}
-CFLAGS			= -Werror -Wall -Wextra -g
+CFLAGS			= -Werror -Wall -Wextra -g -pthread
 CC				= gcc
 RM				= rm -rf
 MAKE			= make
@@ -102,7 +102,7 @@ ${NAME}: ${OBJS}
 			@${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 			@${END_COMP}
 			@sleep 0.5
-
+ 
 # Run the program
 run:	clear ${NAME}
 			@echo "${GREEN}🔧 Operations completed: 🔧${ENDCOLOR}"
