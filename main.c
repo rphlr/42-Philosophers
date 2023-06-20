@@ -59,6 +59,7 @@ void	_sleep(t_philo *philosophers)
 void	_die(t_philo *philosophers)
 {
 	philosophers->utils->should_stop = DEAD;
+	usleep(1000);
 	print_status(philosophers, RED""_DEAD""RESET);
 }
 
@@ -321,10 +322,7 @@ void	sleep_ms(long int ms, t_philo *philosophers)
 	while (timer_ms < ms)
 	{
 		if (should_stop(philosophers))
-		{
-			philosophers->utils->should_stop = DEAD;
 			return ;
-		}
 		timer_ms = get_time_diff(start_time, get_time());
 		usleep(ms / 10);
 	}
