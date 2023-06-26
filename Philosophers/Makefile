@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/06/26 13:53:24 by rrouille         ###   ########.fr        #
+#    Updated: 2023/06/26 13:36:41 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -122,12 +122,10 @@ c:		clear ${NAME}
 # Tests
 test:
 			@echo "${CLEAR}${GREEN}✨ Running tester: ✨${ENDCOLOR}"
+			@pwd
 			@cd .. && mv Philosophers philo
-			@cd tester && script -q -c "./test.sh ../../ 1"
-			@cd .. && mv philo Philosophers
-#			@mv philo Philosophers
-#			@cd philo/tester/test.sh && bash test.sh ../../ 1
-#			@cd ../.. && mv philo Philosophers
+			@cd philo/tester/test.sh && bash test.sh ../../ 1
+			@cd ../.. && mv philo Philosophers
 t:
 			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
 			@cd tester && bash loop.sh ${ARGS}
