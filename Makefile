@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/06/26 13:53:24 by rrouille         ###   ########.fr        #
+#    Updated: 2023/06/26 16:31:14 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,7 +62,7 @@ SRCS			= ${shell find ${SRCSDIR} -maxdepth 1 -type f -name '*.c'}
 OBJS			= ${patsubst ${SRCSDIR}%,${OBJSDIR}%,${SRCS:%.c=%.o}}
 SRCSBNS			= ${shell find ${SRCSBNSDIR} -type f -name '*.c'}
 OBJSBNS			= ${patsubst ${SRCSBNSDIR}%,${OBJSBNSDIR}%,${SRCSBNS:%.c=%.o}}
-CFLAGS			= -Werror -Wall -Wextra -g -fsanitize=thread #-pthread 
+CFLAGS			= -Werror -Wall -Wextra -g -fsanitize=thread -pthread 
 CC				= gcc
 RM				= rm -rf
 MAKE			= make
@@ -114,31 +114,16 @@ r:		clear ${NAME}
 # Count eat times
 count:	clear ${NAME}
 			@echo "${GREEN}🍴 Number of meal received by philosophers: 🍴${ENDCOLOR}"
-			@./${NAME} ${ARGS} | grep "1 is eating" | wc -l
+			@./${NAME} ${ARGS} | grep "is eating" | wc -l
 c:		clear ${NAME}
 			@echo "${GREEN}🍴 Number of meal received by philosophers: 🍴${ENDCOLOR}"
-			@./${NAME} ${ARGS} | grep "1 is eating" | wc -l
+			@./${NAME} ${ARGS} | grep "is eating" | wc -l
 
-# Tests
-test:
-			@echo "${CLEAR}${GREEN}✨ Running tester: ✨${ENDCOLOR}"
-			@cd .. && mv Philosophers philo
-			@cd tester && script -q -c "./test.sh ../../ 1"
-			@cd .. && mv philo Philosophers
-#			@mv philo Philosophers
-#			@cd philo/tester/test.sh && bash test.sh ../../ 1
-#			@cd ../.. && mv philo Philosophers
-t:
-			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
-			@cd tester && bash loop.sh ${ARGS}
+# Check forbidden functions
+ff:		clear ${NAME}
+			@echo "${GREEN}🔧 Used functions: 🔧${ENDCOLOR}"
+			@nm -u ./${NAME} | awk '{print $2}' | sed -E 's/^_//'
 
-# Check if the program is correct
-#check:	clear ${NAME}
-#			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
-#			@./${NAME} ${ARGS} | ./checker_Mac ${ARGS}
-#c:		clear ${NAME}
-#			@echo "${CLEAR}${GREEN}✨ Result of checker: ✨${ENDCOLOR}"
-#			@./${NAME} ${ARGS} | ./checker_Mac ${ARGS}
 
 # Bonus
 bonus:	draw_bonus ${OBJSBNS}
