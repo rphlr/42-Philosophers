@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/06/28 18:06:14 by rrouille         ###   ########.fr        #
+#    Updated: 2023/06/28 18:07:33 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -194,8 +194,11 @@ draw_ready:
 			@sleep 0.3
 			@echo "${ENDCOLOR}"
 			@make help PRINT_SCREEN=NO
-			if [ ${OS} = "Darwin" ]; then \
+			@if [ ${OS} = "Darwin" ]; then \
 				say -v Samantha "Program ready to run"; \
+			fi
+			@if [ ${OS} = "Linux" ]; then \
+				espeak "Program ready to run"; \
 			fi
 
 draw_run:
