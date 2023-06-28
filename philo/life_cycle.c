@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 13:20:35 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/28 16:47:41 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/28 18:30:47 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,20 +85,7 @@ void	_eat(t_philo *philosophers)
 		&& can_pick_fork(philosophers, &next->fork_mutex))
 	{
 		if (!should_stop_value)
-		{
-			philosophers->state = EAT_;
-			print_status(philosophers, YELLOW""EATING""RESET);
-			pthread_mutex_lock(&philosophers->time_mtx);
-			philosophers->last_meal_time = get_time();
-			pthread_mutex_unlock(&philosophers->time_mtx);
-			if (philosophers->running.eating_count > 0)
-			{
-				pthread_mutex_lock(&philosophers->n_eat_mutex);
-				philosophers->n_eat += 1;
-				pthread_mutex_unlock(&philosophers->n_eat_mutex);
-			}
-			sleep_ms(philosophers->running.time_to_eat, philosophers);
-		}
+			should_eat(philosophers);
 	}
 	pthread_mutex_unlock(&philosophers->fork_mutex);
 	pthread_mutex_unlock(&next->fork_mutex);

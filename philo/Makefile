@@ -6,7 +6,7 @@
 #    By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/14 15:20:40 by rrouille          #+#    #+#              #
-#    Updated: 2023/06/28 18:07:33 by rrouille         ###   ########.fr        #
+#    Updated: 2023/06/28 18:24:31 by rrouille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,7 +62,7 @@ SRCS			= ${shell find ${SRCSDIR} -maxdepth 1 -type f -name '*.c'}
 OBJS			= ${patsubst ${SRCSDIR}%,${OBJSDIR}%,${SRCS:%.c=%.o}}
 SRCSBNS			= ${shell find ${SRCSBNSDIR} -type f -name '*.c'}
 OBJSBNS			= ${patsubst ${SRCSBNSDIR}%,${OBJSBNSDIR}%,${SRCSBNS:%.c=%.o}}
-CFLAGS			= -Werror -Wall -Wextra #-g -pthread -fsanitize=thread
+CFLAGS			= -Werror -Wall -Wextra -g -pthread -fsanitize=thread
 CC				= gcc
 RM				= rm -rf
 MAKE			= make

@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/05 15:33:06 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/28 16:45:14 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/06/28 18:32:14 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,5 +135,6 @@ t_philo				*create_philos(t_philo *prev, t_running running, int i,
 						t_utils *utils);
 t_running			create_running(int ac, char **av);
 int					ft_strcmp(char *s1, char *s2);
+void				should_eat(t_philo *philosophers);
 
 #endif
