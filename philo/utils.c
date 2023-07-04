@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 13:20:35 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/28 18:18:15 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/07/04 14:54:00 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,7 @@ void	sleep_ms(long int ms, t_philo *philosophers)
 
 	start_time = get_time();
 	timer_ms = get_time_diff(start_time, get_time());
-	pthread_mutex_lock(&philosophers->utils->stop_mutex);
-	should_stop_value = philosophers->utils->should_stop;
-	pthread_mutex_unlock(&philosophers->utils->stop_mutex);
+	should_stop_value = should_stop(philosophers);
 	while (timer_ms < ms)
 	{
 		if (should_stop_value)

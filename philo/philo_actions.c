@@ -6,7 +6,7 @@
 /*   By: rrouille <rrouille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 13:20:35 by rrouille          #+#    #+#             */
-/*   Updated: 2023/06/28 18:31:09 by rrouille         ###   ########.fr       */
+/*   Updated: 2023/07/04 14:52:03 by rrouille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,7 @@ int	can_pick_fork(t_philo *philosophers, pthread_mutex_t *fork_mutex)
 {
 	int	should_stop_value;
 
-	pthread_mutex_lock(&philosophers->utils->stop_mutex);
-	should_stop_value = philosophers->utils->should_stop;
-	pthread_mutex_unlock(&philosophers->utils->stop_mutex);
+	should_stop_value = should_stop(philosophers);
 	if (!fork_mutex)
 		return (0);
 	if (!pthread_mutex_lock(fork_mutex))
